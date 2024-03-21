@@ -1,0 +1,335 @@
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+    <!-- Load Fontawesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.2/css/all.css"
+        integrity="sha384-rtJEYb85SiYWgfpCr0jn174XgJTn4rptSOQsMroFBPQSGLdOC5IbubP6lJ35qoM9" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    
+    
+<style>
+    body {
+  background-color: #f5f5f5;
+  font-family: "Roboto", sans-serif;
+  padding: 40px 0;
+}
+
+/* Text Styles */
+
+h1 {
+  text-align: center;
+  font-weight: 700;
+  margin: 50px 0;
+  color: #181836;
+}
+
+span {
+  color: #f54260;
+}
+
+h2 {
+  text-align: center;
+  font-weight: 400;
+  color: white;
+  background-color: #f54260;
+  padding: 15px 0;
+  border-radius: 3.33px 3.33px 0 0;
+  cursor: pointer;
+}
+
+h3 {
+  font-size: 21px;
+  font-weight: 400;
+  display: inline-block;
+  width: 270px;
+  margin-left: 20px;
+}
+
+p {
+  text-align: center;
+  padding: 15.5px 0;
+  width: 50px;
+  margin: 0;
+  display: inline-block;
+  border-radius: 3.33px;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* /Text Styles */
+
+
+/* Calendar Styles */
+
+#container {
+  margin: 0 auto;
+  width: 378px;
+  color: white;
+  background-color: #181836ed;
+  border-radius: 3.33px;
+}
+
+#dates {
+  background-color: #181836;
+  height: 324px;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  border-radius: 0 0 3.33px 3.33px;
+  -webkit-box-shadow: 0px 6px 11px -1px rgba(0,0,0,0.6);
+  -moz-box-shadow: 0px 6px 11px -1px rgba(0,0,0,0.6);
+  box-shadow: 0px 6px 11px -1px rgba(0,0,0,0.6);
+}
+
+#head p {
+  font-weight: 700;
+}
+
+.dates {
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all .2s ease-in-out;
+}
+
+.dates:hover {
+  border: 2px solid #f54260;
+}
+
+.selected {
+  background-color: #f54260;
+  color: white;
+  opacity: 1 !important;
+}
+
+#month i {
+  color: #f54260;
+  cursor: pointer;
+  font-size: 25px;
+  margin: 0 10px;
+}
+
+.opacity {
+  opacity: .3;
+}
+
+#calendar {
+  display: none;
+}
+
+/* /Calendar Styles */
+</style>
+</head>
+
+<body>
+    <h1><span>jQuery</span> Calendar</h1>
+
+<div id="container">
+  <!-- Date Title -->
+  <h2 id="selectedDate"></h2>
+  <!-- Calendar -->
+  <div id="calendar">
+    <!-- Month and Arrows-->
+    <div id="month">
+      <h3></h3>
+      <a id="angle_up" href="#1_9_2019"><i class="fas fa-angle-up"></i></a>
+      <a id="angle_down" href="#1_10_2019"><i class="fas fa-angle-down"></i></a>
+    </div>
+    <!-- Days of Week -->
+    <div id="head">
+      <p>Su</p>
+      <p>Mo</p>
+      <p>Tu</p>
+      <p>We</p>
+      <p>Th</p>
+      <p>Fr</p>
+      <p>Sa</p>
+    </div>
+    <!-- Date Tiles -->
+    <div id="dates"></div>
+  </div>
+</div>
+<script>
+    function isLeap(year) {
+  if (year % 4 == 0){
+    return 29;
+  }
+  else {
+    return 28;
+  }
+}
+
+// Declare arrays
+const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+// This array gives the index for months with only 30 days. September = 9
+const thirty = [9, 4, 6, 11];
+
+let d = new Date();
+
+var currentMonth = d.getMonth();
+let currentDate = d.getDate();
+let currentDay = d.getDay();
+var currentYear = d.getFullYear();
+
+// Use this variable to easily scale the calendar to display how many months you want.
+var maxMonths = 130;
+
+// Create text based upon the selected date.
+$("#selectedDate").text(`${currentDate} ${months[currentMonth]} ${currentYear}`);
+$("#month h3").text(`${months[currentMonth]} ${currentYear}`);
+
+
+/*
+
+To get the days from other months I created a loop that would loop for over 12 months.
+
+*/
+  for (var j = 1; j <= maxMonths; j++){
+    currentMonth++;
+        
+    // If month goes past December, reset month and add a year.
+    if (currentMonth == 13) {
+      currentMonth = 1;
+      currentYear = currentYear + 1;
+    }
+    
+    // Get first of Month and Day.
+    let firstOfMonth = new Date(`${currentMonth}/1/${currentYear}`);
+    let firstOfMonthDay = firstOfMonth.getDay();
+    
+    // Check for Days in Month
+    if ($.inArray(currentMonth, thirty) > -1) {
+       var lastDay = 30;
+    }
+    else if (currentMonth == 2) {
+      var lastDay = isLeap(currentYear);
+    }
+    else {
+      var lastDay = 31;
+    }
+    
+    // Loop through the amount of days in the month to create the date tiles
+    for (var i = 1; i <= lastDay; i++) {
+      let date = new Date(`${currentMonth}/${i}/${currentYear}`);
+      let day = date.getDay();
+      
+      /*
+      To correctly display the first date on the correct day, I will need to do a check and add empty blocks.
+      */
+      if(firstOfMonth.getDate() == i && j == 1) {
+        for(var k = 0; k < day; k++){
+          $("#dates").append("<p></p>");
+        }
+      }
+      
+      // Add tile to div
+      $("#dates").append(`<p class="dates" id="${i}_${currentMonth}_${currentYear}">${i}</>`)
+      
+      // If its the last day of the month and last month of the loop - check to add empty tiles.
+      if(i == lastDay && j == maxMonths) {
+        for(var l = 0; l < (6 - day); l++){
+          $("#dates").append("<p></p>");
+        }
+      }
+      
+      // When a day reaches Saturday, break
+      if(days[day] == days[6]) {
+        $("#dates").append("<br/>")
+      }
+    }
+  }
+
+// Add selected style to selected date by accessing its id.
+$(`#${currentDate}_${d.getMonth()+1}_${d.getFullYear()}`).addClass("selected");
+
+// When user clicks on a new date, selectedDate will be updated
+$(".dates").click(function(e) {
+  var newDate = e.target.id;
+  var newDateArr = newDate.split("_");
+  
+  $(".selected").removeClass("selected");
+  $(this).addClass("selected");
+  
+  $("#selectedDate").text(`${newDateArr[0]} ${months[newDateArr[1]-1]} ${newDateArr[2]}`);
+  
+  // $("#calendar").slideToggle(200);
+});
+
+
+
+/* -*-*- Calendar Navigation -*-*- */ 
+
+var getMonth = d.getMonth();
+var updatedMonth = getMonth + 1;
+
+var getYear = d.getFullYear();
+var updatedYear = getYear;
+
+// Add opacity to next or previous month to add more clarity.
+$(".dates").not(`[id*=${updatedMonth}_${updatedYear}]`).addClass("opacity");
+
+$("#angle_down").click(function(){
+  // If user reaches end of calender, disable event
+  if (updatedMonth == getMonth + 1 && updatedYear == getYear + 10) {
+    $("#angle_down").addClass("opacity");
+    return false;
+  }
+  
+  $(".opacity").removeClass("opacity");
+  
+  updatedMonth++;
+  
+  // If month goes past December, reset month and add a year.
+  if (updatedMonth == 13) {
+    updatedMonth = 1;
+    updatedYear = updatedYear + 1;
+  }
+  
+  var link = `#1_${updatedMonth}_${updatedYear}`;
+  $("#angle_down").attr("href", link);
+  $("h3").text(months[updatedMonth-1] + " " + updatedYear);
+  
+  // Add opacity to next or previous month to add more clarity.
+  $(".dates").not(`[id*=${updatedMonth}_${updatedYear}]`).addClass("opacity");
+});
+
+$("#angle_up").click(function(){
+  // If user reaches beginning of calender, disable event
+  if (updatedMonth == getMonth + 1 && updatedYear == getYear) {
+    $("#angle_up").addClass("opacity");
+    return false;
+  }
+  
+  updatedMonth--;
+  
+  // If a months value is before January, reset month to December and remove a year.
+  if (updatedMonth == 0) {
+    updatedMonth = 12;
+    updatedYear = updatedYear - 1;
+  }
+  
+  var link = `#1_${updatedMonth}_${updatedYear}`;
+  $("#angle_up").attr("href", link);
+  $("h3").text(months[updatedMonth-1] + " " + updatedYear);
+  
+  $(".opacity").removeClass("opacity");
+  // Add opacity to any day not in the selected month.
+  $(".dates").not(`[id*=${updatedMonth}_${updatedYear}]`).addClass("opacity");
+});
+
+/* -*-*- /Calendar Navigation -*-*- */ 
+
+// When user clicks on h2, slide the calendar.
+$("h2").click(function(){
+  $("#calendar").slideToggle(200);
+})
+</script>
+</body>
+</html>
